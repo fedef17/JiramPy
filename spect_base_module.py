@@ -549,7 +549,7 @@ def plotta_sim_VIMS(nomefile,freq,obs,sim,sims,names,err=1.5e-8,title='Plot', au
     return
 
 
-def plotcorr(x, y, filename, xlabel = 'x', ylabel = 'y'):
+def plotcorr(x, y, filename, xlabel = 'x', ylabel = 'y', xlim = [-1,-1], ylim = [-1,-1]):
     """
     Plots correlation graph between x and y, fitting a line and calculating Pearson's R coeff.
     :param filename: abs. path of the graph
@@ -564,9 +564,14 @@ def plotcorr(x, y, filename, xlabel = 'x', ylabel = 'y'):
     ax = fig.add_subplot(111)
     pl.xlabel(xlabel)
     pl.ylabel(ylabel)
-    pl.scatter(x, y, label='Results', color='blue')
-    pl.plot(xlin, xlin*m+c, color='red', label="r = {:8.3g}".format(pearR))
-    pl.legend(loc=1)
+    pl.grid()
+    if xlim[0] != xlim[1]:
+        pl.xlim(xlim[0],xlim[1])
+    if ylim[0] != ylim[1]:
+        pl.ylim(ylim[0],ylim[1])
+    pl.scatter(x, y, label='Results', color='blue', s=2)
+    pl.plot(xlin, xlin*m+c, color='red', label='y = {:8.2g}*x + {:8.2g}'.format(m,c))
+    pl.legend(loc=3,fancybox =1)
     fig.savefig(filename, format='eps', dpi=150)
     pl.close()
 

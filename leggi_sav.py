@@ -12,10 +12,15 @@ from subprocess import call
 import pickle
 import scipy.io as io
 from scipy.interpolate import PchipInterpolator as spline
-from mayavi import mlab
+#from mayavi import mlab
 
-cart = '/home/fede/Scrivania/Jiram/DATA/TEST_marisa/'
-cart2 = '/home/fede/Scrivania/Jiram/DATA/TEST_marisa/Spe_prova/'
+cart = '/home/federico/Jiram/DATA/JM0003_SAV/'
+
+nomeout = 'aur_JM0003_limb2000.pic'
+thres = 0.005 # soglia per l'indice di H3+
+mincu = 30 # minimo numero di pixel buoni nel cubo
+
+###########################################################################################
 
 nomi_c = ['pc_lon_1','pc_lon_2','pc_lon_3','pc_lon_4','pc_lat_1','pc_lat_2','pc_lat_3','pc_lat_4',
           'pg_lon_1','pg_lon_2','pg_lon_3','pg_lon_4','pg_lat_1','pg_lat_2','pg_lat_3','pg_lat_4',
@@ -41,7 +46,7 @@ pix_.dtype.names = nomi
 
 pixtot = pix_
 
-with open(cart+'lista_S','r') as lista:
+with open(cart+'lista','r') as lista:
     for line in lista:
         nome = line.rstrip()
         nomefi = line.rstrip()+'.sav'
@@ -58,12 +63,20 @@ with open(cart+'lista_S','r') as lista:
         n_lin = np.shape(spe)[0]
         n_sam = np.shape(spe)[1]
 
+
+	pixcu = pix_
         for i in range(n_lin):
             for j in range(n_sam):
                 corners = corners_
                 pix = pix_
+	        #if(geo[i,j,28] == 0):
+	        #    print(geo[i,j,32])
 
-                cond = (geo[i,j,17] > 60.0 or geo[i,j,17] < -60.0) and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
+                #cond = (geo[i,j,17] > 60.0 or geo[i,j,17] < -60.0) and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
+                #cond = geo[i,j,17] > 50.0 and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
+                cond = (geo[i,j,28] == 0 and geo[i,j,32]<2e7)
+                geo[i,j,32]=1e-3*geo[i,j,32]
+                #cond = geo[i,j,17] < -60.0 and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
                 if(cond):
                     el = 0
                     pix[0][el] = nome
@@ -90,13 +103,19 @@ with open(cart+'lista_S','r') as lista:
 
                     fu = jirfu.checkqual(wls,spe[i,j,:])
 
+                    if(ind_h3p < thres): continue
                     if(fu == 0): continue
 
-                    pixtot = np.append(pixtot, pix)
+                    pixcu = np.append(pixcu, pix)
 #
+        pixcu = pixcu[1:]
+        print(len(pixcu))
+        if(len(pixcu) < mincu): continue
+        pixtot = np.append(pixtot,pixcu)
         print(len(pixtot))
 
-pickle.dump(pixtot,open(cart+'pix_nadir_S_bis.pic','w'))
+pixtot = pixtot[1:]
+pickle.dump(pixtot,open(cart+nomeout,'w'))
 
 #         print(np.shape(spe))
 #         print(np.shape(geo))

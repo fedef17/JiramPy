@@ -20,6 +20,7 @@ import spiceypy.spiceypy as spice
 
 #spice.tkvrsn("TOOLKIT")
 
+spice.bsrchi
 spice.furnsh('/home/fede/Scrivania/Jiram/DATA/KERNELS_JIRAM/Kernels_jm0003/jm0003.mk')
 
 print('ciao')
