@@ -20,7 +20,6 @@ import spiceypy.spiceypy as spice
 
 #spice.tkvrsn("TOOLKIT")
 
-spice.bsrchi
 spice.furnsh('/home/fede/Scrivania/Jiram/DATA/KERNELS_JIRAM/Kernels_jm0003/jm0003.mk')
 
 print('ciao')
@@ -48,7 +47,7 @@ pos2,lt2 = spice.spkgps(targ, et2, ref, obs)
 print(pos2)
 
 # Trova il boresight
-et3 = spice.str2et('2016-08-27T14:55:58.817')
+et3 = spice.str2et('2016-08-26T17:23:47.817')
 method = 'Ellipsoid'
 target = 'JUPITER'
 abcorr = 'CN+S' #"CN+S"
