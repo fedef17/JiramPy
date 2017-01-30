@@ -31,6 +31,7 @@ pl.colorbar()
 pl.show()
 pl.close()
 
+sys.exit()
 
 # for i in range(101):
 #     for j in range(101):
