@@ -23,16 +23,16 @@ import matplotlib.gridspec as gridspec
 #cart ='/home/federico/JIRAM/JIRAM_MAP/Results_new_N_lampo/'
 #cart80 ='/home/federico/JIRAM/JIRAM_MAP/Results_new_N_lampo_80/'
 
-input_file = '/home/fede/Scrivania/Dotto/Git/JiramPy/input_mappe_S.in'
+input_file = '/home/fedefab/Scrivania/Research/Dotto/Git/JiramPy/input_mappe_S.in'
 
 # try:
 #     input_file = sys.argv[1]
 # except:
 #     raise ValueError('You have to insert the input file path to run the program, in this way: ----->     python mappe.py /path/to/input_file   <------')
 
-keys = 'cart cart80 cartres cartout picfile picfile500 picfile80 polo lch4 l500 lN80 lshi maxchi mcol mincol tmax npix aurm emissMAX cstep tstep errmax maxint maxch4 maxch4_c stepint stepch4 stepch4_c'
+keys = 'cart cart80 cartres cartout picfile picfile500 picfile80 polo lch4 l500 lN80 lshi maxchi mcol mincol tmax tmin npix aurm emissMAX cstep tstep errmax maxint maxch4 maxch4_c stepint stepch4 stepch4_c lim_ratio_max lim_ratio_min step_ratio npix_ratio'
 keys = keys.split()
-types = [str,str,str,str,str,str,str,str,bool,bool,bool,bool,float,float,float,float,int,str,float,float,float,float,float,float,float,float,float,float]
+types = [str,str,str,str,str,str,str,str,bool,bool,bool,bool,float,float,float,float,float,int,str,float,float,float,float,float,float,float,float,float,float,float,float,float,int]
 
 values = sbm.read_inputs(input_file,keys,itype=types,verbose=True)
 
@@ -55,6 +55,7 @@ maxchi = values['maxchi']
 mcol = values['mcol']
 mincol = values['mincol']
 tmax = values['tmax']
+tmin = values['tmin']
 npix = values['npix']
 aurm = values['aurm']
 emissMAX = values['emissMAX']
@@ -67,6 +68,10 @@ maxch4_c = values['maxch4_c']
 stepint = values['stepint']
 stepch4 = values['stepch4']
 stepch4_c = values['stepch4_c']
+lim_ratio_max = values['lim_ratio_max']
+lim_ratio_min = values['lim_ratio_min']
+step_ratio = values['step_ratio']
+npix_ratio = values['npix_ratio']
 
 # sys.exit()
 #
@@ -93,15 +98,21 @@ cbarlaberrcol = 'Relative error'
 cbarlabtemp = r'$H_3^+$ temperature (K)'
 cbarlaberrtemp = r'Error on $H_3^+$ temperature (K)'
 cbarlabch4 = r'CH$_4$ column ($\times 10^{{{}}}$ cm$^{{-2}}$)'
-
 cbarlabint = r'Integrated intensity ($\times 10^{{{}}}$ $W {{m}}^{{-2}} {{sr}}^{{-1}}$)'
-titleintegr = 'Integrated intensity'
 
+titleintegr = 'Integrated intensity'
 titlecol = r'$H_3^+$ column'
 titleerrcol = r'Relative error on $H_3^+$ column'
 titletemp = r'$H_3^+$ temperature'
 titleerrtemp = r'Error on $H_3^+$ temperature'
 titlech4 = r'CH$_4$ column'
+
+titleintegr = ''
+titlecol = ''
+titleerrcol = ''
+titletemp = ''
+titleerrtemp = ''
+titlech4 = ''
 
 ####################################################################################
 ####################                                   #############################
@@ -263,11 +274,20 @@ print('EDGES')
 print(len(edges),len(pixs))
 
 integr = np.zeros(len(pixs))
+ratio_32_35 = np.zeros(len(pixs))
+ratio_32_37 = np.zeros(len(pixs))
+ratio_35_37 = np.zeros(len(pixs))
+erratio_32_35 = np.zeros(len(pixs))
+erratio_32_37 = np.zeros(len(pixs))
+erratio_35_37 = np.zeros(len(pixs))
 for ww,spp,of,i in zip(pixs.wl,pixs.spe,off,range(len(pixs))):
     nano = np.isnan(spp)
     spp[nano] = 0.0
     mask = jirfu.findspi(ww,spp)
     integr[i] = jirfu.integr_h3p(ww,spp*mask,of)
+    ratio_32_35[i], erratio_32_35[i] = jirfu.ratio32_35(ww, spp*mask, of)
+    ratio_32_37[i], erratio_32_37[i] = jirfu.ratio32_37(ww, spp*mask, of)
+    ratio_35_37[i], erratio_35_37[i] = jirfu.ratio35_37(ww, spp*mask, of)
 
 integr=integr*np.cos(np.pi*pixs.emiss_angle/180.0)
 
@@ -282,7 +302,7 @@ pdf_scatt_2 = PdfPages(cartout+'MAPPE_scatt_errc_errt.pdf')
 pdf_scatt_3 = PdfPages(cartout+'MAPPE_scatt_errcRel_errt.pdf')
 
 #for filt in [0,1,2,3,4]:
-for filt in [0,1]:
+for filt in [1]:
     print('TOT: {}'.format(len(pixs)))
 
     if filt == 0:
@@ -317,6 +337,28 @@ for filt in [0,1]:
         if not os.path.exists(cartout2): os.makedirs(cartout2)
     ##################################################################
 
+# I RATIOS
+
+    if polo == 'S':
+        blats = [-60.0]*4
+    else:
+        blats = [55.0]*4
+
+    npix2 = npix_ratio
+    cmappa = 'jet'
+    # titleratio = r'Band intensity ratio: I({}$\,\mu$m)/I({}$\,\mu$m)'
+    # jirfu.stereomap2(lon[coto],lat[coto],ratio_32_35[coto],nomefi=cartout2+'RATIO_MAP_32_35_'+lab+'.pdf',title=titleratio.format(3.2,3.5),step=0.05,polo=polo,cbarlabel='',cbarform='%.1f',minu=0.5,maxu=1.0,addpoints=False,show=False,xres=npix2,aur_model=aurm, cmap = cmappa, blats = blats)
+    # jirfu.stereomap2(lon[coto],lat[coto],ratio_32_37[coto],nomefi=cartout2+'RATIO_MAP_32_37_'+lab+'.pdf',title=titleratio.format(3.2,3.7),step=0.05,polo=polo,cbarlabel='',cbarform='%.1f',minu=0.5,maxu=1.0,addpoints=False,show=False,xres=npix2,aur_model=aurm, cmap = cmappa, blats = blats)
+    # jirfu.stereomap2(lon[coto],lat[coto],ratio_35_37[coto],nomefi=cartout2+'RATIO_MAP_35_37_'+lab+'_VIP4.pdf',title=titleratio.format(3.5,3.7),step=step_ratio,polo=polo,cbarlabel='',cbarform='%.2f',minu=lim_ratio_min,maxu=lim_ratio_max,addpoints=False,show=False,xres=npix2,aur_model='VIP4', cmap = cmappa, blats = blats, print_values = True)
+    # jirfu.stereomap2(lon[coto],lat[coto],ratio_35_37[coto],nomefi=cartout2+'RATIO_MAP_35_37_'+lab+'_stat.pdf',title=titleratio.format(3.5,3.7),step=step_ratio,polo=polo,cbarlabel='',cbarform='%.2f',minu=lim_ratio_min,maxu=lim_ratio_max,addpoints=False,show=False,xres=npix2,aur_model='stat', cmap = cmappa, blats = blats, print_values = True)
+    #
+    # titleratio = r'Error on band intensity ratio: I({}$\,\mu$m)/I({}$\,\mu$m)'
+    # jirfu.stereomap2(lon[coto],lat[coto],erratio_32_35[coto],nomefi=cartout2+'ERRATIO_MAP_32_35_'+lab+'.pdf',title=titleratio.format(3.2,3.5),step=0.05,polo=polo,cbarlabel='',cbarform='%.1f',minu=0.0,maxu=0.5,addpoints=False,show=False,xres=npix2,aur_model=aurm, cmap = cmappa, blats = blats)
+    # jirfu.stereomap2(lon[coto],lat[coto],erratio_32_37[coto],nomefi=cartout2+'ERRATIO_MAP_32_37_'+lab+'.pdf',title=titleratio.format(3.2,3.7),step=0.05,polo=polo,cbarlabel='',cbarform='%.1f',minu=0.0,maxu=0.5,addpoints=False,show=False,xres=npix2,aur_model=aurm, cmap = cmappa, blats = blats)
+    # jirfu.stereomap2(lon[coto],lat[coto],erratio_35_37[coto],nomefi=cartout2+'ERRATIO_MAP_35_37_'+lab+'_VIP4.pdf',title=titleratio.format(3.5,3.7),step=0.05,polo=polo,cbarlabel='',cbarform='%.1f',minu=0.0,maxu=1.0,addpoints=False,show=False,xres=npix2,aur_model='VIP4', cmap = cmappa, blats = blats, print_values = True)
+    # jirfu.stereomap2(lon[coto],lat[coto],erratio_35_37[coto],nomefi=cartout2+'ERRATIO_MAP_35_37_'+lab+'_stat.pdf',title=titleratio.format(3.5,3.7),step=0.05,polo=polo,cbarlabel='',cbarform='%.1f',minu=0.0,maxu=1.0,addpoints=False,show=False,xres=npix2,aur_model='stat', cmap = cmappa, blats = blats, print_values = True)
+
+
     fig = pl.figure(figsize=(16, 6), dpi=150)
     gs = gridspec.GridSpec(1, 2)
     gs.update(hspace=0.25,wspace=0.25)
@@ -344,7 +386,7 @@ for filt in [0,1]:
     gs = gridspec.GridSpec(1, 2)
     gs.update(hspace=0.25,wspace=0.25)
     ax = pl.subplot(gs[0])
-    jirfu.stereomap2(lon[coto],lat[coto],temp[coto],nomefi=cartout2+'MAP_h3p_temp'+lab2+lab+'.pdf',title=titletemp, polo=polo,cbarlabel=cbarlabtemp,cbarform='%.0f',step=tstep,minu=700.,maxu=tmax, show=False,xres=npix,aur_model=aurm,pdf=pdf_temp,axu=ax)
+    jirfu.stereomap2(lon[coto],lat[coto],temp[coto],nomefi=cartout2+'MAP_h3p_temp'+lab2+lab+'.pdf',title=titletemp, polo=polo,cbarlabel=cbarlabtemp,cbarform='%.0f',step=tstep,minu=tmin,maxu=tmax, show=False,xres=npix,aur_model=aurm,pdf=pdf_temp,axu=ax)
     ax = pl.subplot(gs[1])
     jirfu.stereomap2(lon[coto],lat[coto],err_t[coto],nomefi=cartout2+'ERR_h3p_temp'+lab2+lab+'.pdf',title=titleerrtemp,cbarlabel=cbarlaberrtemp,cbarform='%.0f', polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.,maxu=80,step=5,axu=ax)
     fig.savefig(cartout2+'MAPERR_temp'+lab+'.pdf', format='pdf', dpi=150)
@@ -352,6 +394,9 @@ for filt in [0,1]:
 
     jirfu.stereomap2(lon[coto],lat[coto],ch4[coto],nomefi=cartout2+'MAP_ch4_col'+lab+'.pdf',title=titlech4,cbarlabel=cbarlabch4,cbarform='%.1f',cbarmult=13,polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.0,maxu=maxch4,step=stepch4)
     jirfu.stereomap2(lon[coto],lat[coto],ch4_c[coto],nomefi=cartout2+'MAP_ch4_col_c'+lab+'.pdf',title=titlech4,cbarlabel=cbarlabch4,cbarform='%.1f',cbarmult=13,polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.0,maxu=maxch4_c,step=stepch4_c,salta=3)
+    jirfu.stereomap2(lon[coto],lat[coto],ch4_c[coto],nomefi=cartout2+'MAP_ch4_col_norm'+lab+'.pdf',title=r'Relative CH$_4$ abundance',cbarlabel=r'Relative CH$_4$ abundance',cbarform='%.1f',polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.0,maxu=maxch4_c,step=stepch4_c,salta=3, normalize = True, print_values = True)
+
+    sys.exit()
 
     # # # i plot punto per punto
     # print('CONTROLLO',len(lon),len(lat),len(col),len(coto))
@@ -376,15 +421,21 @@ for filt in [0,1]:
     gs = gridspec.GridSpec(2, 2)
     gs.update(hspace=0.25,wspace=0.25)
     ax = pl.subplot(gs[0])
-    jirfu.stereoplot(lon[coto],lat[coto],pixs.emiss_angle[coto],nomefi=cartout2+'emiss_angle'+lab+'.pdf',polo=polo,title='Emission angle [deg]',aur_model=aurm,edges=edges[coto],axu=ax,style='small')
+    jirfu.stereoplot(lon[coto],lat[coto],pixs.emiss_angle[coto],nomefi=cartout2+'emiss_angle'+lab+'.pdf',polo=polo,cbarlabel='Emission angle (deg)',aur_model=aurm,edges=edges[coto],axu=ax,style='medium')
     ax = pl.subplot(gs[1])
-    jirfu.stereoplot(lon[coto],lat[coto],pixs.incid_angle[coto],nomefi=cartout2+'incid_angle'+lab+'.pdf',polo=polo,title='Incidence angle [deg]',aur_model=aurm,edges=edges[coto],invert_cmap=True,axu=ax,style='small')
+    jirfu.stereoplot(lon[coto],lat[coto],pixs.incid_angle[coto],nomefi=cartout2+'incid_angle'+lab+'.pdf',polo=polo,cbarlabel='Incidence angle (deg)',aur_model=aurm,edges=edges[coto],invert_cmap=True,axu=ax,style='medium')
     ax = pl.subplot(gs[2])
-    jirfu.stereoplot(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'integr_h3p_'+lab+'.eps',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,show=False,aur_model=aurm,edges=edges[coto],axu=ax,style='small')
+    jirfu.stereoplot(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'integr_h3p_'+lab+'.eps',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,show=False,aur_model=aurm,edges=edges[coto],axu=ax,style='medium')
     ax = pl.subplot(gs[3])
-    jirfu.stereomap2(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'MAP_integr_h3p'+lab+'.eps',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,addpoints=False,show=False,xres=npix,aur_model=aurm,axu=ax,style='small')
+    jirfu.stereomap2(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'MAP_integr_h3p'+lab+'.eps',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,addpoints=False,show=False,xres=npix,aur_model=aurm,axu=ax,style='medium')
     #pl.tight_layout()
     fig.savefig(cartout2+'panel_'+lab+'.pdf', format='pdf', dpi=150)
+
+    jirfu.stereoplot(lon[coto],lat[coto],pixs.emiss_angle[coto],nomefi=cartout2+'emiss_angle'+lab+'.pdf',polo=polo,cbarlabel='Emission angle (deg)',aur_model=aurm,edges=edges[coto])
+    jirfu.stereoplot(lon[coto],lat[coto],pixs.incid_angle[coto],nomefi=cartout2+'incid_angle'+lab+'.pdf',polo=polo,cbarlabel='Incidence angle (deg)',aur_model=aurm,edges=edges[coto],invert_cmap=True)
+    jirfu.stereoplot(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'integr_h3p_'+lab+'.pdf',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,show=False,aur_model=aurm,edges=edges[coto])
+    jirfu.stereoplot(lon[coto],lat[coto],pixs.solar_time[coto]/2.4,nomefi=cartout2+'solar_time'+lab+'.pdf',polo=polo,cbarlabel='Solar time (hr)',aur_model=aurm,edges=edges[coto],invert_cmap=True)
+
 
     #
     # # Alcuni scatter plots

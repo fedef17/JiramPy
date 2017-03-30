@@ -1,29 +1,29 @@
 File di input per MAPPE.
 
 [cart]
-/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_new_lampo/
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_new_lampo/
 
 [cart80]
-/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_new_lampo_80/
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_new_lampo_80/
 
 [cartres]
-/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_new_lampo/
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_new_lampo/
 
 
 # Da dove leggo il file .pic originale e il .pic per i 500 km:
 
 [picfile500]
-/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_nadir_70_CH4/all_pixs_500.pic
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_nadir_70_CH4/all_pixs_500.pic
 
 [picfile]
-/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_nadir_70_CH4/all_pixs.pic
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_nadir_70_CH4/all_pixs.pic
 
 [picfile80]
-/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_nadir_80_CH4/all_pixs.pic
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_nadir_80_CH4/all_pixs.pic
 
 # Dove metto le mappe:
 [cartout]
-/home/fede/Scrivania/Jiram/ANALISI/MAPPE/MAPPE_N_lampo/
+/home/fedefab/Scrivania/Research/Jiram/ANALISI/MAPPE/MAPPE_N_lampo/
 
 [polo]
 N
@@ -47,10 +47,13 @@ False
 3e12
 
 [mincol]
-0.
+0.5e12
 
 [tmax]
 950
+
+[tmin]
+700
 
 [npix]
 40
@@ -87,3 +90,15 @@ both
 
 [stepch4_c]
 0.3333e12
+
+[lim_ratio_max]
+1.8
+
+[lim_ratio_min]
+1.3
+
+[step_ratio]
+0.05
+
+[npix_ratio]
+40

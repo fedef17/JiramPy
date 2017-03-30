@@ -17,7 +17,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 pixs_S,col_S,col_c_S,err_c_S,temp_S,err_t_S,chi_S,off_S,shi_S,ch4_S,err_ch4_S,nonan_S = jirfu.leggi_console('S')
 pixs_N,col_N,col_c_N,err_c_N,temp_N,err_t_N,chi_N,off_N,shi_N,ch4_N,err_ch4_N,nonan_N = jirfu.leggi_console('N')
 
-cartout = '/home/fede/Scrivania/Jiram/ANALISI/CH4_corr/'
+cartout = '/home/fedefab/Scrivania/Research/Jiram/ANALISI/CH4_corr/'
 try:
     os.stat(cartout)
 except:
@@ -39,9 +39,9 @@ for pix in pixs_N:
 # set_old = jirfu.JirSet(pixarr, descr = 'Aurora S, vecchio run con il ch4 sbagliato')
 # set_old.read_res(cartpix)
 
-cartlam_S = '/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_S_new_lampo/'
-cartlam_N = '/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_new_lampo/'
-cartlam_N80 = '/home/fede/Scrivania/Jiram/DATA/JM0003_all/aur_N_new_lampo/'
+cartlam_S = '/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_new_lampo/'
+cartlam_N = '/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_new_lampo/'
+cartlam_N80 = '/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_N_new_lampo/'
 
 set_S = jirfu.JirSet(pixarr_S, descr = 'Aurora S, nuovo run lampo')
 set_S.set_res([col_S,err_c_S,temp_S,err_t_S,chi_S,off_S,ch4_S,err_ch4_S])
@@ -167,7 +167,7 @@ _dataN_day = np.nanmean(set_N.spe[cond_N_day],axis=0)
 _dataS_night = np.nanmean(set_S.spe[cond_S_night],axis=0)
 _dataN_night = np.nanmean(set_N.spe[cond_N_night],axis=0)
 
-cartout2 = '/home/fede/Scrivania/Jiram/ANALISI/SOLAR_OFFSET/'
+cartout2 = '/home/fedefab/Scrivania/Research/Jiram/ANALISI/SOLAR_OFFSET/'
 
 jirfu.write_obs_JIR(set_S.wl[1],_dataS_day,np.ones(len(_dataS_day),dtype=int),cartout2+'HO_spet_S.dat',comment='Average spectrum with large offset at South pole (set_lampo.offset > 1.5*mean)')
 jirfu.write_obs_JIR(set_S.wl[1],_dataS_night,np.ones(len(_dataS_night),dtype=int),cartout2+'LO_spet_S.dat',comment='Average spectrum with small offset at South pole (set_lampo.offset < 0.5*mean)')
@@ -187,7 +187,7 @@ pl.legend()
 pl.show()
 
 
-cartout = '/home/fede/Scrivania/Jiram/ANALISI/SOLAR_OFFSET/'
+cartout = '/home/fedefab/Scrivania/Research/Jiram/ANALISI/SOLAR_OFFSET/'
 
 set_N.integr_tot(key='emiss',range=[4700,5000])
 set_N.integr_tot(key='sscatt2',range=[2700,2750])
@@ -198,6 +198,8 @@ okLO = (set_N.sscatt2 < 0.0001) & (set_N.emiss < 0.05)
 # _data_HI2 = np.nanmean(set_N.spe[okHI],axis=0)
 # _data_LO2 = np.nanmean(set_N.spe[okLO],axis=0)
 pickle.dump([set_N[0].wl,set_N.spe[okHI][10],set_N.spe[okLO][10]],file=open(cartout+'Spet_HILO2.pic','w'))
+
+print(set_N[10])
 
 # off=1e-6
 # pl.plot(wlsim,-np.ones(len(wlsim))*off,linestyle=':',color='black')
