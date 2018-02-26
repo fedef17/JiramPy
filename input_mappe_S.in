@@ -1,18 +1,22 @@
 File di input per MAPPE.
 
 [cart]
+/media/hd_B/DATA/Jiram_DATA/JM0003_all/aur_S_new_lampo/
 /home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_new_lampo/
 
 [cartres]
+/media/hd_B/DATA/Jiram_DATA/JM0003_all/aur_S_new_lampo/
 /home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_new_lampo/
 
 
 # Da dove leggo il file .pic originale e il .pic per i 500 km:
 
 [picfile500]
+/media/hd_B/DATA/Jiram_DATA/JM0003_all/aur_S_nadir_70_CH4/all_pixs_500.pic
 /home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_nadir_70_CH4/all_pixs_500.pic
 
 [picfile]
+/media/hd_B/DATA/Jiram_DATA/JM0003_all/aur_S_nadir_70_CH4/all_pixs.pic
 /home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_nadir_70_CH4/all_pixs.pic
 
 # Dove metto le mappe:

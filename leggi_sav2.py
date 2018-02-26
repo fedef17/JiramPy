@@ -14,11 +14,31 @@ import scipy.io as io
 from scipy.interpolate import PchipInterpolator as spline
 #from mayavi import mlab
 
-cart = '/home/fede/Scrivania/Jiram/DATA/TEST_marisa/'
-cart2 = '/home/fede/Scrivania/Jiram/DATA/TEST_marisa/Spe_prova_S_bis/'
+########################  SETUP #######################
 
+# Folder where the original .SAV files are located
+cart_orig = '/home/fede/Scrivania/Jiram/DATA/TEST_marisa/'
+
+# File that contains the names of the .SAV files to be processed, with their relative path inside cart_orig. If set to None, all .SAV files in cart_orig are processed.
+lista = None
+
+# Folder where the output .pic file is located
+cart_out = '/home/fede/Scrivania/Jiram/DATA/TEST_marisa/Spe_prova_S_bis/'
+
+# Name of the output file:
 nomeout = 'pix_nadir_S_bis.pic'
-thres = 0.01 # soglia per l'indice di H3+
+
+# FILTERING THE INPUT PIXELS.
+thres_h3p = 0.0 # threshold for the H3+ index, calculated by the jirfu.ind_h3p() function. Select thres_h3p = 0 to include all data.
+
+flag_nadir = False # If selected, only nadir measurements are retained.
+
+flag_limb = False # If selected only limb measurements are retained.
+
+max_limb_alt = 5000.0 # Only measurements up to max_limb_alt tangent altitude are retained.
+
+min_lat = -90.0 # Minimum latitude of measurements considered.
+max_lat = 90.0 # Maximum latitude of measurements considered.
 
 ###########################################################################################
 
@@ -46,67 +66,83 @@ pix_.dtype.names = nomi
 
 pixtot = pix_
 
-with open(cart+'lista_S','r') as lista:
-    for line in lista:
-        nome = line.rstrip()
-        nomefi = line.rstrip()+'.sav'
-        print(nome)
-        #nome = '160826_205434_JUNO_SPE_00.sav'
+if lista_file is None:
+    lista_tot = os.listdir(cart_orig)
+    lista = [fil for fil in lista_tot if '.sav' in fil or '.SAV' in fil]
+else:
+    with open(cart_orig+lista_file,'r') as listaf:
+        lista = [line.rstrip() for line in listaf.readlines()]
 
-        cubo = io.readsav(cart+nomefi)
-        spe = cubo.spe
-        geo = cubo.geo
-        wls = cubo.wls
-        geo_names = cubo.geo_names
-        lbls = cubo.lbls
+for nomefi in lista:
+    print('Processing '+nomefi)
+    ind = nomefi.index('.sav')
+    if ind < 0:
+        ind = nomefi.index('.SAV')
+    nome = nomefi[:ind]
+    print(nome)
 
-        n_lin = np.shape(spe)[0]
-        n_sam = np.shape(spe)[1]
+    cubo = io.readsav(cart_orig+nomefi)
+    spe = cubo.spe
+    geo = cubo.geo
+    wls = cubo.wls
+    geo_names = cubo.geo_names
+    lbls = cubo.lbls
 
-        pixcu = pix_
-        found = False
-        for i in range(n_lin):
-            for j in range(n_sam):
-                corners = corners_
-                pix = pix_
+    n_lin = np.shape(spe)[0]
+    n_sam = np.shape(spe)[1]
 
-                #cond = (geo[i,j,17] > 60.0 or geo[i,j,17] < -60.0) and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
-                #cond = geo[i,j,17] > 60.0 and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
-                cond = geo[i,j,17] < -60.0 and (geo[i,j,28] == 1)# or geo[i,j,32] < 3000.0)
-                if(cond):
-                    el = 0
-                    pix[0][el] = nome
+    pixcu = pix_
+    found = False
+    for i in range(n_lin):
+        for j in range(n_sam):
+            corners = corners_
+            pix = pix_
+
+            if flag_nadir:
+                cond = (geo[i,j,28] == 1)
+            elif flag_limb:
+                cond = (geo[i,j,28] == 0)
+            else:
+                cond = True
+
+            geo[i,j,32] = 1e-3*geo[i,j,32] # Converting alt in km from m
+
+            cond = cond and (geo[i,j,32] < max_limb_alt) and (geo[i,j,17] > min_lat) and (geo[i,j,17] < max_lat)
+
+            if(cond):
+                el = 0
+                pix[0][el] = nome
+                el+=1
+                pix[0][el] = i
+                el+=1
+                pix[0][el] = j
+                el+=1
+                for l in range(13):
+                    pix[0][el] = lbls[i][l][0]
                     el+=1
-                    pix[0][el] = i
+                for l in range(38):
+                    pix[0][el] = geo[i,j,l]
                     el+=1
-                    pix[0][el] = j
-                    el+=1
-                    for l in range(13):
-                        pix[0][el] = lbls[i][l][0]
-                        el+=1
-                    for l in range(38):
-                        pix[0][el] = geo[i,j,l]
-                        el+=1
 
-                    pix['wl'][0] = wls
-                    pix['spe'][0] = spe[i,j,:]
+                pix['wl'][0] = wls
+                pix['spe'][0] = spe[i,j,:]
 
-                    fondo = jirfu.fondojir(wls,spe[i,j,:])
-                    ind_h3p = jirfu.ind_h3p(wls,spe[i,j,:],fondo)
+                fondo = jirfu.fondojir(wls,spe[i,j,:])
+                ind_h3p = jirfu.ind_h3p(wls,spe[i,j,:],fondo)
 
-                    pix['fondo'] = fondo
-                    pix['ind_h3p'] = ind_h3p
+                pix['fondo'] = fondo
+                pix['ind_h3p'] = ind_h3p
 
-                    fu = jirfu.checkqual(wls,spe[i,j,:],fondo)
+                fu = jirfu.checkqual(wls,spe[i,j,:],fondo)
 
-                    if(ind_h3p < thres): continue
-                    if(fu == 0): continue
+                if(ind_h3p < thres_h3p): continue
+                if(fu == 0): continue
 
-                    found = True
-                    pixcu = np.append(pixcu, pix)
-        pixcu = pixcu[1:]
-        if(found and len(pixcu)>10): pixtot = np.append(pixtot,pixcu)
-        print(len(pixtot))
+                found = True
+                pixcu = np.append(pixcu, pix)
+    pixcu = pixcu[1:]
+    pixtot = np.append(pixtot,pixcu)
+    print(len(pixtot))
 
 pixtot = pixtot[1:]
-pickle.dump(pixtot,open(cart+nomeout,'w'))
+pickle.dump(pixtot,open(cart_out+nomeout,'w'))

@@ -381,6 +381,9 @@ for filt in [1]:
     # nome = cartout2+'MAP_h3p_col_night'+lab+'.eps'
     # jirfu.stereomap2(lon[cond4 & coto],lat[cond4 & coto],col_c[cond4 & coto],nomefi=nome,title=titlecol+' 20h <--> 4h',polo=polo,cbarlabel=cbarlabcol,cbarmult=12,cbarform='%.1f',step=cstep,minu=mincol,maxu=mcol,show=False,xres=npix,aur_model=aurm)
 
+    jirfu.stereomap2(lon[coto],lat[coto],temp[coto],nomefi=cartout2+'MAP_h3p_temp'+lab+'.pdf',title=titletemp, polo=polo,cbarlabel=cbarlabtemp,cbarform='%.0f',step=tstep,minu=tmin,maxu=tmax, show=False,xres=npix,aur_model=aurm)
+    jirfu.stereomap2(lon[coto],lat[coto],col_c[coto],nomefi=cartout2+'MAP_h3p_col'+lab+'.pdf',title=titlecol,polo=polo,cbarlabel=cbarlabcol,cbarmult=12,cbarform='%.1f',step=cstep,minu=mincol,maxu=mcol, show=False, xres=npix, image=False, aur_model=aurm)
+
     lab2 = ''
     fig = pl.figure(figsize=(16, 6), dpi=150)
     gs = gridspec.GridSpec(1, 2)
@@ -396,12 +399,15 @@ for filt in [1]:
     jirfu.stereomap2(lon[coto],lat[coto],ch4_c[coto],nomefi=cartout2+'MAP_ch4_col_c'+lab+'.pdf',title=titlech4,cbarlabel=cbarlabch4,cbarform='%.1f',cbarmult=13,polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.0,maxu=maxch4_c,step=stepch4_c,salta=3)
     jirfu.stereomap2(lon[coto],lat[coto],ch4_c[coto],nomefi=cartout2+'MAP_ch4_col_norm'+lab+'.pdf',title=r'Relative CH$_4$ abundance',cbarlabel=r'Relative CH$_4$ abundance',cbarform='%.1f',polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.0,maxu=maxch4_c,step=stepch4_c,salta=3, normalize = True, print_values = True)
 
+    coto2 = (~np.isnan(col)) & (err_t < 100) & (pixs.pc_lon < 30) & (pixs.pc_lon > 0)
+    pl.ion()
+    jirfu.scatter(pixs.solar_time,col_c,temp,cond = coto2,lat=pixs.pc_lat,lon=pixs.pc_lon,ylim=(0.5,3.e12),xlim=(0,24),pdf=pdf_scatt_1,polo=polo, nome=cartout2+'SP_colc_lon_soltim'+lab+'.pdf',ylabel=r'H$_3^+$ col (cm^{-2})',xlabel='Solar time (hr)',title='color = Temp (K)', live = True)
     sys.exit()
-
     # # # i plot punto per punto
     # print('CONTROLLO',len(lon),len(lat),len(col),len(coto))
     # jirfu.stereoplot(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'integr_h3p_'+lab+'.pdf',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,show=False,aur_model=aurm,edges=edges[coto])
-    # jirfu.stereoplot(lon[coto],lat[coto],col_c[coto],nomefi=cartout2+'h3p_col'+lab+'.pdf',title=titlecol,polo=polo,cbarlabel=cbarlabcol,cbarmult=12,cbarform='%.1f',step=cstep,minu=mincol,maxu=mcol,aur_model=aurm,edges=edges[coto])
+    jirfu.stereoplot(lon[coto],lat[coto],col_c[coto],nomefi=cartout2+'h3p_col'+lab+'.pdf',title=titlecol,polo=polo,cbarlabel=cbarlabcol,cbarmult=12,cbarform='%.1f',step=cstep,minu=mincol,maxu=mcol,aur_model=aurm,edges=edges[coto], live = True)
+    sys.exit()
     # jirfu.stereoplot(lon[coto],lat[coto],col[coto],nomefi=cartout2+'h3p_col_nocorr'+lab+'.pdf',title=titlecol+' (not corrected)',polo=polo,cbarlabel=cbarlabcol,cbarmult=12,cbarform='%.1f',step=cstep,minu=mincol,maxu=8e12,aur_model=aurm,edges=edges[coto])
     # jirfu.stereoplot(lon[coto],lat[coto],temp[coto],nomefi=cartout2+'h3p_temp'+lab+'.pdf',title=titletemp,polo=polo,cbarlabel=cbarlabtemp,cbarform='%.0f',step=tstep,minu=700.,maxu=tmax,aur_model=aurm,edges=edges[coto])
     # if lch4: jirfu.stereoplot(lon[coto],lat[coto],ch4[coto],nomefi=cartout2+'ch4_col'+lab+'.pdf',title=titlech4,polo=polo,aur_model=aurm,edges=edges[coto],cbarlabel=cbarlabch4,cbarform='%.1f',cbarmult=13,minu=0.0,maxu=maxch4)
@@ -415,6 +421,9 @@ for filt in [1]:
     # jirfu.stereoplot(lon[coto],lat[coto],pixs.phase_angle[coto],nomefi=cartout2+'phase_angle'+lab+'.pdf',polo=polo,title='Phase angle [deg]',aur_model=aurm,edges=edges[coto])
     # #jirfu.stereoplot(lon[coto],lat[coto],np.arange(len(pixs))[coto],nomefi=cartout2+'index'+lab+'.pdf',polo=polo,title='Index',aur_model=aurm,edges=edges[coto])
     #
+
+    jirfu.stereomap2(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'MAP_integr_h3p'+lab+'.pdf',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,addpoints=False,show=False,xres=npix,aur_model=aurm)
+    #jirfu.stereomap2(lon[coto],lat[coto],ch4[coto],nomefi=cartout2+'MAP_ch4_col'+lab+'.pdf',title=titlech4,cbarlabel=cbarlabch4,cbarform='%.1f',cbarmult=13,polo=polo, show=False,xres=npix,aur_model=aurm,minu=0.0,maxu=maxch4,step=stepch4)
 
     # Faccio il panel
     fig = pl.figure(figsize=(8, 6), dpi=150)
@@ -431,6 +440,8 @@ for filt in [1]:
     #pl.tight_layout()
     fig.savefig(cartout2+'panel_'+lab+'.pdf', format='pdf', dpi=150)
 
+    sys.exit()
+
     jirfu.stereoplot(lon[coto],lat[coto],pixs.emiss_angle[coto],nomefi=cartout2+'emiss_angle'+lab+'.pdf',polo=polo,cbarlabel='Emission angle (deg)',aur_model=aurm,edges=edges[coto])
     jirfu.stereoplot(lon[coto],lat[coto],pixs.incid_angle[coto],nomefi=cartout2+'incid_angle'+lab+'.pdf',polo=polo,cbarlabel='Incidence angle (deg)',aur_model=aurm,edges=edges[coto],invert_cmap=True)
     jirfu.stereoplot(lon[coto],lat[coto],integr[coto],nomefi=cartout2+'integr_h3p_'+lab+'.pdf',title=titleintegr,step=stepint,polo=polo,cbarlabel=cbarlabint,cbarmult=-4,cbarform='%.1f',minu=0.0,maxu=maxint,show=False,aur_model=aurm,edges=edges[coto])
@@ -440,8 +451,7 @@ for filt in [1]:
     #
     # # Alcuni scatter plots
     # yy = lambda x: 100/0.4*x
-    # jirfu.scatter(col,temp,err_t,cond = coto,lat=pixs.pc_lat,lon=pixs.pc_lon,ylim=(700,1200),xlim=(0,1e13),pdf=pdf_scatt_1,polo=polo,
-    #               nome=cartout2+'SP_col_temp_errt'+lab+'.eps',xlabel='H3+ col (cm-2)',ylabel='Temp (K)',title='color = Temp. err (K) : FILT {}')
+    # jirfu.scatter(col,temp,err_t,cond = coto,lat=pixs.pc_lat,lon=pixs.pc_lon,ylim=(700,1200),xlim=(0,1e13),pdf=pdf_scatt_1,polo=polo, nome=cartout2+'SP_col_temp_errt'+lab+'.pdf',xlabel=r'H$_3^+$ col (cm^{-2})',ylabel='Temp (K)',title='color = Temp. err (K) : FILT {}')
     # jirfu.scatter(err_c,err_t,temp,cond=coto,lat=pixs.pc_lat,lon=pixs.pc_lon,ylim=(0,200),xlim=(0,1.5e12),clim=(700,tmax),pdf=pdf_scatt_2,polo=polo,
     #               nome=cartout2+'SP_errc_errt_temp'+lab+'.eps',xlabel='Error H3+ col (cm-2)',ylabel='Error Temp (K)',title='color = Temp (K) : FILT {}')
     # jirfu.scatter(err_c/col,err_t,temp,cond = coto,lat=pixs.pc_lat,lon=pixs.pc_lon,ylim=(0,200),xlim=(0,1),clim=(700,tmax),pdf=pdf_scatt_3,polo=polo,
