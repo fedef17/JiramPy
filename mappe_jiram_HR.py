@@ -18,20 +18,19 @@ import matplotlib.gridspec as gridspec
 ################# SETUP ##################
 
 # File from which the input variables are read:
-input_file = '/home/fedefab/Scrivania/Research/Dotto/Git/JiramPy/input_mappe_S.in'
+input_file = '/home/fedefab/Scrivania/Research/Dotto/Git/JiramPy/input_mappe.in'
 
-# Tipi di filtering da applicare ai risultati. Lista di valori da 0 a 4. 0 = nessun filtro, 1 = filtro articoli 2017.
+# Tipi di filtering da applicare ai risultati. Lista di valori da 0 a 4. 0 = nessun filtro, 1 = filtro articoli 2017. Per farli tutti mettere [0,1,2,3,4]
 list_filts = [0,1]
 
 ##################################################
 
-keys = 'cart cartres cartout picfile polo lch4 lshi maxchi mcol mincol tmax tmin npix aurm emissMAX cstep tstep errmax maxint maxch4 maxch4_c stepint stepch4 stepch4_c lim_ratio_max lim_ratio_min step_ratio npix_ratio'
+keys = 'cartres cartout picfile polo lch4 lshi maxchi mcol mincol tmax tmin npix aurm emissMAX cstep tstep errmax_T maxint maxch4 maxch4_c stepint stepch4 stepch4_c lim_ratio_max lim_ratio_min step_ratio npix_ratio'
 keys = keys.split()
-types = [str,str,str,str,str,bool,bool,float,float,float,float,float,int,str,float,float,float,float,float,float,float,float,float,float,float,float,float,int]
+types = [str,str,str,str,bool,bool,float,float,float,float,float,int,str,float,float,float,float,float,float,float,float,float,float,float,float,float,int]
 
 values = sbm.read_inputs(input_file,keys,itype=types,verbose=True)
 
-cart = values['cart']
 cartres = values['cartres']
 picfile = values['picfile']
 cartout = values['cartout']
@@ -51,7 +50,7 @@ aurm = values['aurm']
 emissMAX = values['emissMAX']
 cstep = values['cstep']
 tstep = values['tstep']
-errmax = values['errmax']
+errmax_T = values['errmax_T']
 maxint = values['maxint']
 maxch4 = values['maxch4']
 maxch4_c = values['maxch4_c']
@@ -211,7 +210,7 @@ for filt in list_filts:
         cartout2 = cartout + lab + '/'
         if not os.path.exists(cartout2): os.makedirs(cartout2)
     elif filt == 1:
-        coto = (~np.isnan(col)) & (err_t < 100)
+        coto = (~np.isnan(col)) & (err_t < errmax_T)
         lab = '_fil1'
         print('OK'+lab+': {}'.format(len(pixs[coto])))
         cartout2 = cartout + lab + '/'
@@ -369,7 +368,7 @@ for filt in list_filts:
     i = 0
     fu='{:05d}'+'{:>28s}'+2*'{:4d}'+5*'{:7.2f}'+'{:10.2e}'+3*'{:11.3e}'+2*'{:9.2f}'+'{:7.2f}'+'{:9.2e}'+'{:11.3e}'+'{:7.2f}'+'{:11.3e}'+'\n'
     fun='{:>5s}'+'{:>28s}'+2*'{:>4s}'+5*'{:>7s}'+'{:>10s}'+3*'{:>11s}'+2*'{:>9s}'+'{:>7s}'+'{:>9s}'+'{:>11s}'+'{:>7s}'+'{:>11s}'+'\n'
-    fi.write('Results for cart {:40s}\n'.format(cart))
+    fi.write('Results for cart {:40s}\n'.format(cartres))
     fi.write('Legend: num -> id number, cubo -> obs. cube, i -> line, j -> sample, lon -> planetocentric longitude, '
              'lat -> planetocentric latitude, emi -> emission angle, sza -> sza, stime -> local solar time, '
              'dist -> slant distance [m], col -> retrieved h3p column [cm-2], err_c -> retrieval error, '

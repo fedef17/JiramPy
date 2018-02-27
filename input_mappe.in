@@ -1,0 +1,114 @@
+File di input per mappe_jiram_HR.py.
+
+# Cartella dove leggo i risultati:
+[cartres]
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_new_lampo/
+
+# Path del file all_pixs.pic che contiene le info sui pixel usati (output di lancia_fit.py):
+[picfile]
+/home/fedefab/Scrivania/Research/Jiram/DATA/JM0003_all/aur_S_nadir_70_CH4/all_pixs.pic
+
+# Dove metto le mappe finali:
+[cartout]
+/home/fedefab/Scrivania/Research/Jiram/ANALISI/MAPPE/MAPPE_S_lampo/
+
+# Specificare se le mappe sono per il polo Nord (N) o Sud (S).
+[polo]
+S
+
+# Is CH4 abundance fitted?
+[lch4]
+True
+
+# Is frequency shift fitted?
+[lshi]
+False
+
+#############################################
+########### FILTERING #######################
+
+# Filter out results with chi^2 greater than:
+[maxchi]
+20
+
+# Filter out results with emission angle greater than:
+[emissMAX]
+75.0
+
+# Filter out results with error on temperature greater than: (this will be applied for FILT_1)
+[errmax_T]
+100
+
+############################################
+###### SETTINGS for the graphics #########
+
+# Number of small segments in which the map is divided to make the averages. ### IMPORTANT ###
+[npix]
+50
+
+# Max value of h3p abundance colorbar.
+[mcol]
+3.0e12
+
+# Min value of h3p abundance colorbar.
+[mincol]
+0.5e12
+
+# Max value of h3p temperature colorbar.
+[tmax]
+1100
+
+# Min value of h3p temperature colorbar.
+[tmin]
+850
+
+# Auroral model to print on the map (stat, vip4 or both)
+[aurm]
+both
+
+# Step for the colorbar axis of H3p abundance.
+[cstep]
+0.25e12
+
+# Step for the colorbar axis of H3p temperature.
+[tstep]
+25
+
+# Step for the colorbar axis of integrated intensity.
+[stepint]
+1.5e-5
+
+# Max value for the colorbar axis of integrated intensity.
+[maxint]
+1.5e-4
+
+# Max value for the colorbar axis of CH4 column.
+[maxch4]
+2.0e13
+
+# Same for the graph with the CORRECTED CH4 column.
+[maxch4_c]
+1.5e13
+
+# Step for the colorbar axis of CH4 column.
+[stepch4]
+1.5e12
+
+# Same for the graph with the CORRECTED CH4 column.
+[stepch4_c]
+1.333e12
+
+########### OTHERS ###################
+
+# Settings for the images with intensity ratios of the H3p bands. Currently commented in the source file.
+[npix_ratio]
+30
+
+[lim_ratio_max]
+1.83333
+
+[lim_ratio_min]
+1.5
+
+[step_ratio]
+0.0333333
